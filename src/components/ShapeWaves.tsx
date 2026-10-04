@@ -258,9 +258,10 @@ struct Composite { strength: vec4f }
 }
 `;
 
-const parseColor = (value, fallback) => {
+const parseColor = (value: string, fallback: string): number[] => {
   const source = typeof value === 'string' ? value.trim() : '';
   const match = /^#?([\da-f]{3}|[\da-f]{6})$/i.exec(source) || /^#?([\da-f]{6})$/i.exec(fallback);
+  if (!match) throw new Error(`Invalid color value: ${value}`);
   let hex = match[1];
   if (hex.length === 3) hex = hex.replace(/./g, char => char + char);
   return [0, 2, 4].map(offset => parseInt(hex.slice(offset, offset + 2), 16) / 255);
@@ -499,7 +500,7 @@ export default function ShapeWaves({
       onErrorRef.current?.(error instanceof Error ? error : new Error(String(error)));
     };
 
-    const measureSurface = () => {
+    const measureSurface = (): [number, number] => {
       dpr = Math.min(window.devicePixelRatio || 1, MAX_DPR);
       return [Math.max(1, Math.round(canvas.clientWidth * dpr)), Math.max(1, Math.round(canvas.clientHeight * dpr))];
     };
@@ -511,7 +512,9 @@ export default function ShapeWaves({
         unsubscribeGpuError = gpu.onError(reportFailure);
 
         const initialSize = measureSurface();
-        const outputFormat = navigator.gpu.getPreferredCanvasFormat();
+        const outputFormat = (navigator as Navigator & {
+          gpu?: { getPreferredCanvasFormat(): 'bgra8unorm' | 'rgba8unorm' };
+        }).gpu?.getPreferredCanvasFormat() ?? 'bgra8unorm';
         const output = surface(gpu, canvas, { dpr, size: initialSize, autoResize: false, format: outputFormat });
 
         const params = uniforms(gpu, {
@@ -546,7 +549,8 @@ export default function ShapeWaves({
           set: { params, maskTexture, maskSampler: linearSampler, charges: chargeBuffer }
         });
         const sceneTarget = target(gpu, { size: initialSize, format: 'rgba8unorm', label: 'shape-waves-scene' });
-        const glowSize = (size: number[]) => [Math.max(1, Math.ceil(size[0] / 2)), Math.max(1, Math.ceil(size[1] / 2))];
+        const glowSize = (size: readonly [number, number]): [number, number] =>
+          [Math.max(1, Math.ceil(size[0] / 2)), Math.max(1, Math.ceil(size[1] / 2))];
         const glowA = target(gpu, { size: glowSize(initialSize), format: 'rgba8unorm', label: 'shape-waves-glow-a' });
         const glowB = target(gpu, { size: glowSize(initialSize), format: 'rgba8unorm', label: 'shape-waves-glow-b' });
         const blurParamsX = uniforms(gpu, { direction: [0, 0, 4, 1] });

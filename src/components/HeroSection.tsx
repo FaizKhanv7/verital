@@ -4,7 +4,6 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import AnimatedCounter from '@/components/AnimatedCounter';
 import MagneticButton from '@/components/MagneticButton';
-import ShapeWaves from '@/components/ShapeWaves';
 
 export default function HeroSection() {
   const headline = 'Georgia, online.'.split(' ');
@@ -18,30 +17,6 @@ export default function HeroSection() {
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden bg-[#FAFAFA] px-4 pt-32 pb-16">
-      {/* ShapeWaves Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <ShapeWaves
-          color="#F97316"
-          hoverColor="#ffffff"
-          backgroundColor="#FAFAFA"
-          speed={1}
-          scale={1}
-          contrast={1}
-          brightness={0.4}
-          flow={0}
-          direction={0}
-          fade={0.25}
-          interactive={true}
-          splashRadius={40}
-          splashStrength={0.4}
-          glow={0.35}
-          intro={true}
-          introDuration={1.6}
-          paused={false}
-          style={{ width: '100%', height: '100%' }}
-        />
-      </div>
-
       <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col items-center text-center">
         <motion.span
           initial={{ opacity: 0, y: 10 }}
