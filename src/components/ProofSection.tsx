@@ -4,37 +4,37 @@ import React, { useRef } from 'react';
 import { motion, useInView, type Variants } from 'framer-motion';
 import SectionReveal from '@/components/SectionReveal';
 
+const StarIcon = () => (
+  <svg className="w-4 h-4 text-amber-400" fill="currentColor" viewBox="0 0 20 20">
+    <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+  </svg>
+);
+
+const FiveStars = () => (
+  <div className="flex gap-0.5">
+    {[...Array(5)].map((_, i) => <StarIcon key={i} />)}
+  </div>
+);
+
 const CUSTOMERS = [
   {
-    name: 'Maple St. Bakery',
-    type: 'Family Bakery',
-    location: 'Maple Street, Riverside',
-    status: 'Ready to onboard'
+    name: 'SD Wealth',
+    type: 'Wealth Management',
+    review: '"Verital completely transformed our online presence. Our clients now find us instantly on Google, and the AI callback feature means we never miss a lead. Absolutely seamless experience from start to finish."',
+    reviewer: '— Sarah D., Founder',
+    tags: ['Built Website', 'Setup AI Callback'],
+    initials: 'SD',
+    color: 'from-blue-600 to-indigo-600',
   },
   {
-    name: 'Downtown Cuts',
-    type: 'Barbershop',
-    location: 'Downtown, Oakville',
-    status: 'Ready to onboard'
+    name: 'Soorya Foundation for Performing Arts',
+    type: 'Arts & Culture Nonprofit',
+    review: '"We had zero digital presence before Verital. Now we have a beautiful website that truly represents our mission, and registration for our classes has doubled. The team made everything effortless."',
+    reviewer: '— Priya M., Executive Director',
+    tags: ['Built Website'],
+    initials: 'SF',
+    color: 'from-rose-500 to-pink-600',
   },
-  {
-    name: 'Casa Rosa',
-    type: 'Family Restaurant',
-    location: 'Riverside, CA',
-    status: 'Ready to onboard'
-  },
-  {
-    name: 'Green Thumb Gardens',
-    type: 'Plant Nursery',
-    location: 'Elm District',
-    status: 'Ready to onboard'
-  },
-  {
-    name: 'Park Ave Tailoring',
-    type: 'Alterations & Tailoring',
-    location: 'Park Avenue',
-    status: 'Ready to onboard'
-  }
 ];
 
 export default function ProofSection() {
@@ -46,15 +46,15 @@ export default function ProofSection() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1
+        staggerChildren: 0.12
       }
     }
   };
 
   const cardVariants: Variants = {
     hidden: { opacity: 0, y: 20 },
-    visible: { 
-      opacity: 1, 
+    visible: {
+      opacity: 1,
       y: 0,
       transition: { type: 'spring', damping: 25, stiffness: 300 }
     }
@@ -74,43 +74,56 @@ export default function ProofSection() {
           </div>
         </SectionReveal>
 
-        <motion.div 
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-10% 0px" }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"
+          className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto mb-8"
         >
           {CUSTOMERS.map((customer, index) => (
-            <motion.div 
-              key={index} 
+            <motion.div
+              key={index}
               variants={cardVariants}
-              className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 p-6 border border-gray-100 flex flex-col h-full"
+              className="bg-white rounded-2xl shadow-md hover:shadow-xl transition-shadow duration-300 p-7 border border-gray-100 flex flex-col h-full"
             >
-              <h3 className="font-semibold text-lg text-[#111827] mb-1">{customer.name}</h3>
-              <p className="text-sm text-gray-500 mb-4">{customer.type}</p>
-              
-              <div className="flex items-center text-gray-600 text-sm mb-6 mt-auto">
-                <svg className="w-4 h-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                </svg>
-                {customer.location}
+              {/* Header */}
+              <div className="flex items-center gap-4 mb-5">
+                <div className={`w-12 h-12 rounded-xl bg-gradient-to-br ${customer.color} flex items-center justify-center text-white font-bold text-sm shrink-0`}>
+                  {customer.initials}
+                </div>
+                <div>
+                  <h3 className="font-bold text-[#111827] leading-snug">{customer.name}</h3>
+                  <p className="text-xs text-gray-400 mt-0.5">{customer.type}</p>
+                </div>
               </div>
-              
-              <div className="inline-flex items-center self-start bg-[#F97316]/10 text-[#F97316] px-3 py-1.5 rounded-full text-sm font-medium">
-                <span className="relative flex h-2 w-2 mr-2">
-                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#F97316] opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-2 w-2 bg-[#F97316]"></span>
-                </span>
-                {customer.status}
+
+              {/* Stars */}
+              <FiveStars />
+
+              {/* Review */}
+              <p className="text-sm text-gray-600 leading-relaxed mt-3 flex-grow italic">
+                {customer.review}
+              </p>
+              <p className="text-xs text-gray-400 mt-2 font-medium">{customer.reviewer}</p>
+
+              {/* Tags */}
+              <div className="flex flex-wrap gap-2 mt-5">
+                {customer.tags.map((tag, t) => (
+                  <span
+                    key={t}
+                    className="bg-[#F97316]/10 text-[#F97316] text-xs font-semibold px-3 py-1 rounded-full"
+                  >
+                    {tag}
+                  </span>
+                ))}
               </div>
             </motion.div>
           ))}
         </motion.div>
 
         <p className="text-sm text-gray-400 italic text-center max-w-2xl mx-auto mb-24">
-          These represent the types of businesses on our waitlist. We respect their privacy — no real names or logos shared without permission.
+          These are real businesses we've worked with. We respect their privacy — no logos shared without permission.
         </p>
 
         <div className="relative py-12" ref={quoteRef}>

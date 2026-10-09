@@ -1,201 +1,399 @@
 'use client';
 
-import React from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence, useInView, useReducedMotion, type Variants } from 'framer-motion';
 import AnimatedCounter from '@/components/AnimatedCounter';
-import MagneticButton from '@/components/MagneticButton';
 
 export default function HeroSection() {
-  const headline = 'Georgia, online.'.split(' ');
+  const containerRef = useRef<HTMLDivElement>(null);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
+  const isInView = useInView(containerRef, { once: false, margin: "-20% 0px" });
+  const shouldReduceMotion = useReducedMotion();
+  const [step, setStep] = useState(0);
 
-  const scrollTo = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+  useEffect(() => {
+    if (shouldReduceMotion) {
+      setStep(6);
+      return;
     }
+
+    if (!isInView) {
+      setStep(0);
+      return;
+    }
+
+    // Sequence timings
+    const timers = [
+      setTimeout(() => setStep(1), 2500),  // Show typing indicator
+      setTimeout(() => setStep(2), 4000),  // Show AI initial message
+      setTimeout(() => setStep(3), 5500),  // Customer replies MENU
+      setTimeout(() => setStep(4), 6500),  // AI responds with MENU
+      setTimeout(() => setStep(5), 9000),  // Customer orders
+      setTimeout(() => setStep(6), 10000), // AI confirms order
+      setTimeout(() => setStep(7), 12000), // Toast notification
+      setTimeout(() => setStep(0), 17000), // Reset and loop
+    ];
+
+    return () => timers.forEach(clearTimeout);
+  }, [isInView, shouldReduceMotion]);
+
+  // Smooth auto-scroll whenever step advances
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTo({
+        top: chatScrollRef.current.scrollHeight,
+        behavior: 'smooth',
+      });
+    }
+  }, [step]);
+
+  const TypingIndicator = () => (
+    <div className="flex space-x-1 px-4 py-3 bg-[#E9E9EB] rounded-2xl rounded-tl-sm w-16 items-center justify-center">
+      <motion.div
+        className="w-2 h-2 bg-[#8E8E93] rounded-full"
+        animate={{ y: [0, -4, 0] }}
+        transition={{ duration: 0.5, repeat: Infinity, delay: 0 }}
+      />
+      <motion.div
+        className="w-2 h-2 bg-[#8E8E93] rounded-full"
+        animate={{ y: [0, -4, 0] }}
+        transition={{ duration: 0.5, repeat: Infinity, delay: 0.15 }}
+      />
+      <motion.div
+        className="w-2 h-2 bg-[#8E8E93] rounded-full"
+        animate={{ y: [0, -4, 0] }}
+        transition={{ duration: 0.5, repeat: Infinity, delay: 0.3 }}
+      />
+    </div>
+  );
+
+  const bubbleVariants: Variants = {
+    hidden: { opacity: 0, y: 12, scale: 0.92 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', damping: 22, stiffness: 280 } },
+    exit: { opacity: 0, scale: 0.92, transition: { duration: 0.15 } }
+  };
+
+  const toastVariants: Variants = {
+    hidden: { opacity: 0, y: -20, scale: 0.95 },
+    visible: { opacity: 1, y: 0, scale: 1, transition: { type: 'spring', damping: 20, stiffness: 200 } },
+    exit: { opacity: 0, y: -20, transition: { duration: 0.2 } }
+  };
+
+  const overlayVariants: Variants = {
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.3 } },
+    exit: { opacity: 0, transition: { duration: 0.3 } }
   };
 
   return (
     <section className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden bg-[#FAFAFA] px-4 pt-32 pb-16">
       <div className="relative z-10 w-full max-w-7xl mx-auto flex flex-col items-center text-center">
-        <motion.span
-          initial={{ opacity: 0, y: 10 }}
+        <motion.h1
+          initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-[#F97316] font-semibold tracking-wider text-sm md:text-base uppercase mb-6"
+          transition={{ duration: 0.6, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          className="text-[56px] md:text-[72px] font-bold tracking-tight text-[#111827] leading-[1.1] mb-16"
         >
-          The last-mile digitization partner for Georgia
-        </motion.span>
+          Bringing Georgia Online
+        </motion.h1>
 
-        <h1 className="text-[56px] md:text-[72px] font-bold tracking-tight text-[#111827] leading-[1.1] mb-6">
-          {headline.map((word, i) => (
-            <motion.span
-              key={i}
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{
-                duration: 0.6,
-                delay: i * 0.1 + 0.2,
-                ease: [0.22, 1, 0.36, 1],
+        {/* iPhone Modal */}
+        <motion.div
+          initial={{ opacity: 0, y: 40, rotate: -4 }}
+          animate={{ opacity: 1, y: 0, rotate: -4 }}
+          transition={{ duration: 1, delay: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          className="relative mx-auto"
+          ref={containerRef}
+          style={{ filter: 'drop-shadow(0 40px 80px rgba(0,0,0,0.22)) drop-shadow(0 8px 24px rgba(0,0,0,0.12))' }}
+        >
+          {/* Outer phone body — titanium-like finish */}
+          <div
+            className="relative w-[300px] h-[600px]"
+            style={{ borderRadius: '47px' }}
+          >
+            {/* Side frame (black) */}
+            <div
+              className="absolute inset-0 rounded-[47px]"
+              style={{
+                background: 'linear-gradient(145deg, #1c1c1e 0%, #2c2c2e 40%, #1a1a1c 60%, #242426 100%)',
+                boxShadow: `
+                  inset 0 1px 0 rgba(255,255,255,0.12),
+                  inset 0 -1px 0 rgba(0,0,0,0.6),
+                  0 0 0 0.5px rgba(0,0,0,0.5)
+                `
               }}
-              className="inline-block mr-3 lg:mr-4"
+            />
+
+            {/* Screen inset */}
+            <div
+              className="absolute bg-white overflow-hidden"
+              style={{
+                top: '6px',
+                left: '6px',
+                right: '6px',
+                bottom: '6px',
+                borderRadius: '42px',
+              }}
             >
-              {word}
-            </motion.span>
-          ))}
-        </h1>
-
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.6, ease: [0.22, 1, 0.36, 1] }}
-          className="max-w-2xl text-lg md:text-xl text-gray-600 mb-10 leading-relaxed"
-        >
-          Verital turns offline mom-and-pop shops into modern digital businesses — payments, websites, online stores, and AI-powered automation — in weeks, not years.
-        </motion.p>
-
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.8, ease: [0.22, 1, 0.36, 1] }}
-          className="flex flex-col sm:flex-row items-center gap-4 mb-20"
-        >
-          <MagneticButton variant="primary" onClick={() => scrollTo('demo')}>
-            See how it works
-          </MagneticButton>
-          <MagneticButton variant="secondary" onClick={() => scrollTo('waitlist')}>
-            Book A Demo
-          </MagneticButton>
-        </motion.div>
-
-        {/* Store dashboard preview */}
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, delay: 1, ease: [0.22, 1, 0.36, 1] }}
-          className="relative mx-auto w-full max-w-5xl"
-        >
-          <div className="w-full overflow-hidden rounded-xl border border-[#30343b] bg-[#0c0e11] text-white shadow-[0_32px_100px_-35px_rgba(15,23,42,0.65)]">
-            <div className="flex h-12 items-center justify-between border-b border-white/[0.08] bg-[#14171b] px-4 md:px-6">
-              <div className="flex items-center gap-2.5">
-                <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[#f97316] text-xs font-bold">V</span>
-                <span className="text-xs font-semibold tracking-tight text-gray-100">Verital Store</span>
-                <span className="hidden text-[11px] text-gray-600 sm:inline">/</span>
-                <span className="hidden text-[11px] text-gray-400 sm:inline">Overview</span>
+              {/* Dynamic Island */}
+              <div
+                className="absolute left-1/2 -translate-x-1/2 z-30"
+                style={{ top: '13px' }}
+              >
+                <div
+                  className="bg-black"
+                  style={{
+                    width: '120px',
+                    height: '34px',
+                    borderRadius: '20px',
+                  }}
+                />
               </div>
-              <div className="flex items-center gap-3">
-                <span className="flex items-center gap-1.5 rounded-full border border-emerald-400/20 bg-emerald-400/[0.08] px-2.5 py-1 text-[10px] font-medium text-emerald-300">
-                  <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Live
-                </span>
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-[#343940] text-[10px] font-semibold text-gray-200">PP</span>
-              </div>
-            </div>
-            
-            <div className="flex min-h-[390px]">
-              <aside className="hidden w-44 shrink-0 flex-col border-r border-white/[0.08] bg-[#14171b] p-4 md:flex">
-                <div className="mb-7 flex items-center gap-2.5 px-1">
-                  <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#f97316] text-sm font-bold">P</span>
-                  <div>
-                    <div className="text-xs font-semibold tracking-tight">Peach &amp; Pine</div>
-                    <div className="text-[10px] text-gray-500">Online store</div>
-                  </div>
-                </div>
-                <span className="mb-2 px-2 text-[9px] font-semibold uppercase tracking-[0.14em] text-gray-500">Workspace</span>
-                <nav className="space-y-1 text-[11px]">
-                  <div className="flex items-center gap-2 rounded-md bg-white/[0.09] px-2.5 py-2 font-medium text-white">
-                    <span className="text-[#fb923c]">▦</span> Overview
-                  </div>
-                  {['Orders', 'Products', 'Customers', 'Online store'].map((item) => (
-                    <div key={item} className="flex items-center gap-2 rounded-md px-2.5 py-2 text-gray-400">
-                      <span className="h-3.5 w-3.5 rounded border border-white/20" />
-                      {item}
-                      {item === 'Orders' && <span className="ml-auto rounded bg-white/10 px-1.5 py-0.5 text-[9px]">8</span>}
-                    </div>
-                  ))}
-                </nav>
-                <div className="mt-auto rounded-lg border border-white/[0.08] bg-white/[0.03] p-2.5">
-                  <div className="mb-1 flex items-center gap-1.5 text-[10px] font-medium text-gray-300">
-                    <span className="h-1.5 w-1.5 rounded-full bg-emerald-400" /> Store is live
-                  </div>
-                  <div className="truncate text-[9px] text-gray-500">peachandpine.com</div>
-                </div>
-              </aside>
-              <div className="min-w-0 flex-1 p-4 md:p-6">
-                <div className="mb-5 flex flex-wrap items-end justify-between gap-3">
-                  <div>
-                    <div className="text-[9px] font-medium uppercase tracking-[0.14em] text-gray-500">Store overview</div>
-                    <h2 className="mt-1 text-base font-semibold tracking-tight text-white md:text-lg">Good morning, Alex</h2>
-                  </div>
-                  <div className="rounded-md border border-white/[0.1] bg-white/[0.03] px-2.5 py-1.5 text-[9px] text-gray-300">Last 30 days <span className="ml-2 text-gray-500">⌄</span></div>
-                </div>
-                <div className="grid grid-cols-3 gap-2.5 md:gap-3">
-                  {[
-                    { label: 'Total sales', value: '$12,486', change: '+12.8%' },
-                    { label: 'Orders', value: '284', change: '+8.2%' },
-                    { label: 'Conversion', value: '3.6%', change: '+0.4%' },
-                  ].map((stat) => (
-                    <div key={stat.label} className="rounded-lg border border-white/[0.09] bg-[#13161a] p-3 md:p-4">
-                      <div className="text-[9px] text-gray-500 md:text-[10px]">{stat.label}</div>
-                      <div className="mt-1 text-sm font-semibold tracking-tight text-white md:text-lg">{stat.value}</div>
-                      <div className="mt-1 text-[8px] font-medium text-emerald-400 md:text-[9px]">{stat.change}<span className="ml-1 text-gray-600">vs last month</span></div>
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-3 grid gap-3 lg:grid-cols-[1.6fr_1fr]">
-                  <div className="rounded-lg border border-white/[0.09] bg-[#13161a] p-3.5 md:p-4">
-                    <div className="flex items-start justify-between">
-                      <div>
-                        <div className="text-[10px] font-medium text-gray-200">Sales over time</div>
-                        <div className="mt-1 text-[9px] text-gray-500">Revenue performance</div>
+
+              {/* Screen content */}
+              <div className="absolute inset-0 flex flex-col" style={{ borderRadius: '42px', overflow: 'hidden' }}>
+
+                {/* Status Bar */}
+                <div className="flex items-center justify-between px-7 pt-[18px] pb-1 shrink-0">
+                  <span className="text-[13px] font-semibold text-black tracking-tight">9:41</span>
+                  {/* right status icons */}
+                  <div className="flex items-center gap-[5px]">
+                    {/* Signal bars */}
+                    <svg width="17" height="12" viewBox="0 0 17 12" fill="black">
+                      <rect x="0" y="8" width="3" height="4" rx="0.7"/>
+                      <rect x="4.5" y="5.5" width="3" height="6.5" rx="0.7"/>
+                      <rect x="9" y="3" width="3" height="9" rx="0.7"/>
+                      <rect x="13.5" y="0" width="3" height="12" rx="0.7"/>
+                    </svg>
+                    {/* Battery */}
+                    <div className="flex items-center">
+                      <div className="relative" style={{ width: '25px', height: '12px', border: '1px solid black', borderRadius: '3px', padding: '1px' }}>
+                        <div className="bg-black rounded-sm" style={{ width: '70%', height: '100%' }} />
+                        <div className="absolute -right-[4px] top-1/2 -translate-y-1/2 bg-black rounded-[1px]" style={{ width: '2px', height: '5px' }} />
                       </div>
-                      <span className="text-[9px] text-gray-500">USD&nbsp; ▾</span>
                     </div>
-                    <div className="relative mt-3 h-[100px] overflow-hidden">
-                      <div className="absolute inset-0 flex flex-col justify-between">
-                        <span className="border-t border-dashed border-white/[0.07]" />
-                        <span className="border-t border-dashed border-white/[0.07]" />
-                        <span className="border-t border-dashed border-white/[0.07]" />
-                        <span className="border-t border-dashed border-white/[0.07]" />
+                  </div>
+                </div>
+
+                {/* Chat Header — iMessage style */}
+                <div className="flex flex-col items-center px-4 py-2 border-b border-gray-100 shrink-0">
+                  <div className="w-[42px] h-[42px] rounded-full bg-gradient-to-br from-[#F97316] to-[#FB923C] flex items-center justify-center text-white font-bold text-base shadow-sm mb-0.5">
+                    M
+                  </div>
+                  <div className="text-[13px] font-semibold text-black leading-tight">Helper</div>
+                  <div className="text-[11px] text-[#3C3C43]/60">AI Teammate · Online</div>
+                </div>
+
+                {/* Toast Notification */}
+                <AnimatePresence>
+                  {step >= 7 && (
+                    <motion.div
+                      variants={toastVariants}
+                      initial={shouldReduceMotion ? "visible" : "hidden"}
+                      animate="visible"
+                      exit="exit"
+                      className="absolute top-[88px] inset-x-3 z-30 bg-white/90 backdrop-blur-md border border-gray-200 rounded-2xl p-3 shadow-lg"
+                    >
+                      <div className="flex items-center gap-2 mb-1">
+                        <span className="text-sm">⭐</span>
+                        <span className="text-[11px] font-semibold text-black">New Google Review — Auto-responded</span>
                       </div>
-                      <svg className="absolute inset-0 h-full w-full" viewBox="0 0 500 112" preserveAspectRatio="none" role="img" aria-label="Sales trend rising through the month">
-                        <defs>
-                          <linearGradient id="sales-fill" x1="0" x2="0" y1="0" y2="1">
-                            <stop offset="0%" stopColor="#f97316" stopOpacity=".25" />
-                            <stop offset="100%" stopColor="#f97316" stopOpacity="0" />
-                          </linearGradient>
-                        </defs>
-                        <path d="M0 91 C28 86 35 75 62 79 S99 60 125 67 S160 78 188 55 S225 68 250 48 S285 61 312 39 S350 51 375 31 S412 44 438 20 S474 32 500 8 V112 H0Z" fill="url(#sales-fill)" />
-                        <path d="M0 91 C28 86 35 75 62 79 S99 60 125 67 S160 78 188 55 S225 68 250 48 S285 61 312 39 S350 51 375 31 S412 44 438 20 S474 32 500 8" fill="none" stroke="#fb923c" strokeWidth="2.5" vectorEffect="non-scaling-stroke" />
-                        <circle cx="438" cy="20" r="4" fill="#fb923c" stroke="#13161a" strokeWidth="2" vectorEffect="non-scaling-stroke" />
+                      <p className="text-[10px] text-gray-500 leading-snug">
+                        "Best bakery in town!" — Replied: Thank you so much! We're glad you love our pastries. 🙏
+                      </p>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Call Overlay */}
+                <AnimatePresence>
+                  {step === 0 && !shouldReduceMotion && (
+                    <motion.div
+                      variants={overlayVariants}
+                      initial="hidden"
+                      animate="visible"
+                      exit="exit"
+                      className="absolute inset-0 z-10 bg-white/97 flex flex-col items-center justify-center p-6"
+                      style={{ borderRadius: '42px' }}
+                    >
+                      <div className="w-16 h-16 bg-gray-200 rounded-full mb-3 flex items-center justify-center text-2xl">
+                        👤
+                      </div>
+                      <h3 className="text-[17px] font-semibold mb-0.5 text-black">Maple St. Bakery</h3>
+                      <p className="text-[13px] text-gray-500 mb-8">Incoming call...</p>
+                      <div className="flex gap-8 mt-8">
+                        <div className="flex flex-col items-center gap-2">
+                          <motion.div
+                            animate={{ scale: [1, 1.08, 1] }}
+                            transition={{ repeat: Infinity, duration: 1.5 }}
+                            className="w-14 h-14 rounded-full bg-red-500 flex items-center justify-center"
+                          >
+                            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </motion.div>
+                          <span className="text-[11px] text-gray-500">Decline</span>
+                        </div>
+                        <div className="flex flex-col items-center gap-2">
+                          <motion.div
+                            animate={{ scale: [1, 1.08, 1] }}
+                            transition={{ repeat: Infinity, duration: 1.5, delay: 0.2 }}
+                            className="w-14 h-14 rounded-full bg-green-500 flex items-center justify-center"
+                          >
+                            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                            </svg>
+                          </motion.div>
+                          <span className="text-[11px] text-gray-500">Accept</span>
+                        </div>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+
+                {/* Chat Messages — scrollable */}
+                <div
+                  ref={chatScrollRef}
+                  className="flex-1 overflow-y-auto px-3 py-3 flex flex-col gap-2"
+                  style={{ scrollbarWidth: 'none' }}
+                >
+                  <style>{`div::-webkit-scrollbar { display: none; }`}</style>
+                  <AnimatePresence mode="popLayout">
+                    {step >= 1 && step < 2 && !shouldReduceMotion && (
+                      <motion.div key="typing" variants={bubbleVariants} initial="hidden" animate="visible" exit="exit" className="self-start">
+                        <TypingIndicator />
+                      </motion.div>
+                    )}
+
+                    {step >= 2 && (
+                      <motion.div key="msg1" variants={bubbleVariants} initial={shouldReduceMotion ? "visible" : "hidden"} animate="visible" className="self-start max-w-[82%]">
+                        <div className="bg-gradient-to-br from-[#F97316] to-[#FB923C] text-white rounded-[18px] rounded-tl-[5px] px-3 py-2 text-[12px] leading-[1.4] shadow-sm">
+                          Hi! Thanks for calling Maple St. Bakery. We're helping another customer right now. Can we text you back? Reply MENU to see today's specials. 🧁
+                        </div>
+                        <div className="text-[10px] text-[#8E8E93] mt-0.5 ml-1">Delivered</div>
+                      </motion.div>
+                    )}
+
+                    {step >= 3 && (
+                      <motion.div key="msg2" variants={bubbleVariants} initial={shouldReduceMotion ? "visible" : "hidden"} animate="visible" className="self-end max-w-[82%]">
+                        <div className="bg-[#007AFF] text-white rounded-[18px] rounded-tr-[5px] px-3 py-2 text-[12px] leading-[1.4]">
+                          MENU
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {step >= 4 && (
+                      <motion.div key="msg3" variants={bubbleVariants} initial={shouldReduceMotion ? "visible" : "hidden"} animate="visible" className="self-start max-w-[82%]">
+                        <div className="bg-gradient-to-br from-indigo-600 to-violet-600 text-white rounded-[18px] rounded-tl-[5px] px-3 py-2 text-[12px] leading-[1.4] shadow-sm whitespace-pre-line">
+                          {`Today's specials:\n🥐 Almond Croissant — $4.50\n🍞 Sourdough Loaf — $8.00\n🧁 Red Velvet Cupcake — $3.50\n\nReply with your order + pickup time!`}
+                        </div>
+                        <div className="text-[10px] text-[#8E8E93] mt-0.5 ml-1">Delivered</div>
+                      </motion.div>
+                    )}
+
+                    {step >= 5 && (
+                      <motion.div key="msg4" variants={bubbleVariants} initial={shouldReduceMotion ? "visible" : "hidden"} animate="visible" className="self-end max-w-[82%]">
+                        <div className="bg-[#007AFF] text-white rounded-[18px] rounded-tr-[5px] px-3 py-2 text-[12px] leading-[1.4]">
+                          2 croissants, pickup at 3pm
+                        </div>
+                      </motion.div>
+                    )}
+
+                    {step >= 6 && (
+                      <motion.div key="msg5" variants={bubbleVariants} initial={shouldReduceMotion ? "visible" : "hidden"} animate="visible" className="self-start max-w-[82%]">
+                        <div className="bg-gradient-to-br from-[#F97316] to-[#FB923C] text-white rounded-[18px] rounded-tl-[5px] px-3 py-2 text-[12px] leading-[1.4] shadow-sm">
+                          Got it! 2 Almond Croissants for pickup at 3:00 PM. Total: $9.00. We'll have them ready! 🎉
+                        </div>
+                        <div className="text-[10px] text-[#8E8E93] mt-0.5 ml-1">Delivered</div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                  {/* Scroll anchor */}
+                  <div ref={messagesEndRef} />
+                </div>
+
+                {/* iMessage Composer */}
+                <div className="px-3 pb-1 pt-2 border-t border-gray-100 shrink-0">
+                  <div className="flex items-center gap-2">
+                    <div className="flex-1 bg-white border border-gray-300 rounded-full px-3 py-[7px] flex items-center">
+                      <span className="text-[12px] text-gray-400">iMessage</span>
+                    </div>
+                    <div className="w-7 h-7 rounded-full bg-[#007AFF] flex items-center justify-center shrink-0">
+                      <svg className="w-3.5 h-3.5 text-white" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M2.01 21L23 12 2.01 3 2 10l15 2-15 2z"/>
                       </svg>
                     </div>
-                    <div className="mt-1 flex justify-between text-[8px] text-gray-600"><span>May 1</span><span>May 7</span><span>May 14</span><span>May 21</span><span>May 30</span></div>
                   </div>
-                  <div className="rounded-lg border border-white/[0.09] bg-[#13161a] p-3.5 md:p-4">
-                    <div className="mb-3 flex items-center justify-between">
-                      <div className="text-[10px] font-medium text-gray-200">Recent orders</div>
-                      <span className="text-[9px] text-[#fb923c]">View all</span>
-                    </div>
-                    <div className="space-y-3">
-                      {[
-                        { initials: 'JM', name: 'Jordan M.', item: 'Ceramic pour-over set', amount: '$68.00', color: 'bg-violet-400/20 text-violet-300' },
-                        { initials: 'SK', name: 'Sam K.', item: 'Linen market tote', amount: '$34.00', color: 'bg-sky-400/20 text-sky-300' },
-                        { initials: 'AR', name: 'Avery R.', item: 'Hand-thrown mug', amount: '$42.00', color: 'bg-amber-400/20 text-amber-300' },
-                      ].map((order) => (
-                        <div key={order.initials} className="flex items-center gap-2">
-                          <span className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[8px] font-semibold ${order.color}`}>{order.initials}</span>
-                          <div className="min-w-0 flex-1">
-                            <div className="truncate text-[9px] font-medium text-gray-200">{order.name}</div>
-                            <div className="truncate text-[8px] text-gray-500">{order.item}</div>
-                          </div>
-                          <span className="text-[9px] font-medium text-gray-300">{order.amount}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                </div>
+
+                {/* Home Indicator */}
+                <div className="flex justify-center py-2 shrink-0">
+                  <div className="w-[120px] h-[5px] bg-black rounded-full opacity-20" />
                 </div>
               </div>
             </div>
+
+            {/* Hardware buttons — left side (volume + silent) */}
+            <div
+              className="absolute"
+              style={{
+                left: '-3px',
+                top: '108px',
+                width: '3px',
+                height: '32px',
+                background: 'linear-gradient(to right, #111113, #2a2a2c)',
+                borderRadius: '2px 0 0 2px',
+              }}
+            />
+            <div
+              className="absolute"
+              style={{
+                left: '-3px',
+                top: '158px',
+                width: '3px',
+                height: '60px',
+                background: 'linear-gradient(to right, #111113, #2a2a2c)',
+                borderRadius: '2px 0 0 2px',
+              }}
+            />
+            <div
+              className="absolute"
+              style={{
+                left: '-3px',
+                top: '228px',
+                width: '3px',
+                height: '60px',
+                background: 'linear-gradient(to right, #111113, #2a2a2c)',
+                borderRadius: '2px 0 0 2px',
+              }}
+            />
+
+            {/* Hardware button — right side (power) */}
+            <div
+              className="absolute"
+              style={{
+                right: '-3px',
+                top: '168px',
+                width: '3px',
+                height: '80px',
+                background: 'linear-gradient(to left, #111113, #2a2a2c)',
+                borderRadius: '0 2px 2px 0',
+              }}
+            />
+
+            {/* Screen glare overlay */}
+            <div
+              className="absolute pointer-events-none"
+              style={{
+                top: '6px',
+                left: '6px',
+                right: '6px',
+                bottom: '6px',
+                borderRadius: '42px',
+                background: 'linear-gradient(135deg, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0.04) 40%, transparent 70%)',
+              }}
+            />
           </div>
         </motion.div>
       </div>
@@ -204,8 +402,8 @@ export default function HeroSection() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ duration: 1, delay: 1.5 }}
-        className="relative z-10 w-full max-w-5xl mx-auto mt-20 flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 text-sm text-gray-500"
+        transition={{ duration: 1, delay: 0.8 }}
+        className="relative z-10 w-full max-w-5xl mx-auto mt-16 flex flex-col md:flex-row items-center justify-center gap-6 md:gap-12 text-sm text-gray-500"
       >
         <div className="flex flex-col items-center gap-1">
           <div className="text-2xl font-bold text-[#111827]">

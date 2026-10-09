@@ -12,6 +12,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: 'Verital — Georgia, online.',
   description: 'Helping small businesses go digital and reach more customers with simple, powerful tools.',
+  icons: {
+    icon: '/logo.png',
+  },
 };
 
 export default function RootLayout({

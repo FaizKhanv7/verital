@@ -72,7 +72,7 @@ export default function Navbar() {
           </div>
 
           <div className="hidden md:block">
-            <MagneticButton variant="primary" href="#waitlist" onClick={(e) => handleSmoothScroll(e, 'waitlist')} className="px-5 py-2 text-sm">
+            <MagneticButton variant="primary" href="mailto:helloverital@gmail.com" className="px-5 py-2 text-sm">
               Book A Demo
             </MagneticButton>
           </div>
@@ -113,8 +113,7 @@ export default function Navbar() {
               ))}
               <div className="pt-4 border-t border-gray-100">
                 <a
-                  href="#waitlist"
-                  onClick={(e) => handleSmoothScroll(e, 'waitlist')}
+                  href="mailto:helloverital@gmail.com"
                   className="flex w-full items-center justify-center rounded-lg bg-[#F97316] px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-[#EA580C]"
                 >
                   Book A Demo

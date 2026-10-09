@@ -1,20 +1,8 @@
 'use client'
 
-import { useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
-import Link from 'next/link'
+import { motion } from 'framer-motion'
 
 export default function CTASection() {
-  const [email, setEmail] = useState('')
-  const [submitted, setSubmitted] = useState(false)
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    if (email) {
-      setSubmitted(true)
-    }
-  }
-
   return (
     <section id="waitlist" className="relative overflow-hidden bg-[#F97316] py-24 md:py-32">
       {/* Background Gradient & Noise */}
@@ -54,69 +42,22 @@ export default function CTASection() {
             Book A Demo. Be among the first businesses to go digital with Verital.
           </p>
 
-          <div className="mt-10 mx-auto max-w-md w-full">
-            <AnimatePresence mode="wait">
-              {!submitted ? (
-                <motion.form
-                  key="form"
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
-                  onSubmit={handleSubmit}
-                  className="flex flex-col sm:flex-row gap-3"
-                >
-                  <input
-                    type="email"
-                    required
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="flex-auto rounded-full bg-white/10 border border-white/20 px-6 py-4 text-white placeholder-orange-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-white/50 focus:border-transparent transition"
-                  />
-                  <button
-                    type="submit"
-                    className="flex-none rounded-full bg-white px-8 py-4 font-semibold text-[#F97316] shadow-sm hover:bg-orange-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white transition"
-                  >
-                    Join
-                  </button>
-                </motion.form>
-              ) : (
-                <motion.div
-                  key="success"
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.4, type: "spring", bounce: 0.4 }}
-                  className="flex flex-col items-center justify-center space-y-4 rounded-full bg-white/10 border border-white/20 px-6 py-4"
-                >
-                  <div className="flex items-center space-x-3">
-                    <motion.svg 
-                      className="h-6 w-6 text-white" 
-                      fill="none" 
-                      viewBox="0 0 24 24" 
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <motion.path 
-                        initial={{ pathLength: 0 }}
-                        animate={{ pathLength: 1 }}
-                        transition={{ duration: 0.6, ease: "easeOut" }}
-                        strokeLinecap="round" 
-                        strokeLinejoin="round" 
-                        d="M5 13l4 4L19 7" 
-                      />
-                    </motion.svg>
-                    <span className="text-white font-medium">You're on the list! We'll be in touch.</span>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-          
-          <div className="mt-8">
-            <Link href="#partner" className="text-sm text-orange-100 underline underline-offset-4 hover:text-white transition">
+          <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+            <a
+              href="mailto:helloverital@gmail.com"
+              className="inline-flex items-center gap-2 rounded-full bg-white px-8 py-4 font-semibold text-[#F97316] shadow-sm hover:bg-orange-50 transition"
+            >
+              Book A Demo
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+            <a
+              href="mailto:helloverital@gmail.com"
+              className="text-sm text-orange-100 underline underline-offset-4 hover:text-white transition"
+            >
               Partner with us
-            </Link>
+            </a>
           </div>
         </motion.div>
       </div>

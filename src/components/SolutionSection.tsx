@@ -195,6 +195,19 @@ export default function SolutionSection() {
             </motion.div>
 
           </motion.div>
+
+          {/* Pricing CTA */}
+          <div className="flex justify-center mt-12">
+            <a
+              href="mailto:helloverital@gmail.com"
+              className="inline-flex items-center gap-2 rounded-full bg-[#111827] text-white px-8 py-4 font-semibold text-sm hover:bg-[#1f2937] transition shadow-md"
+            >
+              Contact for pricing
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </a>
+          </div>
         </div>
       </SectionReveal>
     </section>
