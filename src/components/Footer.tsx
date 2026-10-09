@@ -12,7 +12,7 @@ export default function Footer() {
   ]
 
   return (
-    <footer className="bg-[#0F172A] py-16">
+    <footer className="bg-black pt-16 pb-10">
       <div className="mx-auto max-w-7xl px-6 lg:px-8">
         <div className="flex flex-col items-center justify-center space-y-6 md:space-y-8">
           <div className="flex flex-col items-center space-y-2">
@@ -38,7 +38,7 @@ export default function Footer() {
           </nav>
         </div>
         
-        <div className="mt-16 border-t border-gray-800 pt-8 flex items-center justify-center">
+        <div className="mt-16 border-t border-white/[0.06] pt-8 flex items-center justify-center">
           <p className="text-xs leading-5 text-gray-600">
             &copy; 2026 Verital. All rights reserved.
           </p>

@@ -27,7 +27,7 @@ export default function Logo({ className = '', size = 'md', showText = true }: L
         alt="Verital Logo"
         width={size === 'lg' ? 40 : size === 'md' ? 32 : 24}
         height={size === 'lg' ? 40 : size === 'md' ? 32 : 24}
-        className={`${sizeClasses[size]} rotate-[118deg]`}
+        className={`${sizeClasses[size]} rotate-[119deg]`}
       />
       {showText && <span className={`${textClasses[size]} text-text-primary`}>Verital</span>}
     </div>
